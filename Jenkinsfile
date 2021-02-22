@@ -8,17 +8,9 @@ pipeline {
         string(name: 'DOCKER_PORT', defaultValue: '3000', description:'Docker Container Host Port')
     }
 
-    tools {
-        maven 'M3'
-        jdk 'JDK11'
-    }
-    stages {
-        
-        stage('Clear WorkSpace') {
-            steps {
-                cleanWs()
-            }
-        }
+    
+     
+       
 
         stage('Remove Previous Image and Container') {
             steps {
@@ -31,6 +23,8 @@ pipeline {
 
         stage('Create Docker Image') {
             steps {
+				sh 'mvn -version'
+				sh 'mvn clean install'
                 checkout scm
                 withMaven(jdk: 'JDK11') {
                    sh 'mvn -B -DskipTests clean package' 
@@ -43,6 +37,12 @@ pipeline {
             steps {
                 sh 'docker run -d -p $DOCKER_PORT:8080 --name "$CONTAINER_NAME" "$IMAGE_NAME"'
 
+            }
+        }
+
+		 stage('Clear WorkSpace') {
+            steps {
+                cleanWs()
             }
         }
     } 
